@@ -1,0 +1,62 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "A dynamic prompt construction category template",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier" },
+        "name": { "type": "string", "description": "Category name", "maxLength": 150 },
+        "description": { "type": "string", "description": "Short category description", "maxLength": 500 },
+        "icon": { "type": "string", "description": "Lucide icon identifier", "maxLength": 50 },
+        "masterPrompt": { "type": "string", "description": "Complete original master prompt preserving exact structure" },
+        "variables": { "type": "array", "description": "Dynamic variable configurations" },
+        "usageCount": { "type": "number", "description": "Total successful prompt generations" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last update" },
+        "lastUsedAt": { "type": "string", "description": "ISO timestamp of last prompt generation" },
+        "status": { "type": "string", "enum": ["published", "archived"] }
+      },
+      "required": ["name", "masterPrompt", "variables", "usageCount", "status"]
+    },
+    "CategoryUsage": {
+      "title": "CategoryUsage",
+      "description": "Log entry for prompt generation event",
+      "type": "object",
+      "properties": {
+        "categoryId": { "type": "string", "description": "ID of category used" },
+        "usedAt": { "type": "string", "description": "ISO timestamp of usage" }
+      },
+      "required": ["categoryId", "usedAt"]
+    },
+    "Draft": {
+      "title": "Draft",
+      "description": "Unpublished category draft",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique draft identifier" },
+        "name": { "type": "string", "description": "Draft category name" },
+        "description": { "type": "string", "description": "Draft description" },
+        "icon": { "type": "string", "description": "Icon name" },
+        "masterPrompt": { "type": "string", "description": "Draft master prompt text" },
+        "variables": { "type": "array", "description": "Draft dynamic variable configurations" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last edit" }
+      },
+      "required": ["updatedAt"]
+    }
+  },
+  "firestore": {
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Public community category templates"
+    },
+    "/category_usage/{usageId}": {
+      "schema": { "$ref": "#/entities/CategoryUsage" },
+      "description": "Audit and ranking log of prompt construction runs"
+    },
+    "/drafts/{draftId}": {
+      "schema": { "$ref": "#/entities/Draft" },
+      "description": "User in-progress category drafts"
+    }
+  }
+}

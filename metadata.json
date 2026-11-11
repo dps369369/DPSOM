@@ -1,0 +1,6 @@
+{
+  "name": "DPSOM",
+  "description": "Dynamic Prompt Construction Platform - Generate comprehensive, professionally structured AI prompts through predefined master templates and guided question workflows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
