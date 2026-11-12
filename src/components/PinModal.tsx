@@ -49,19 +49,30 @@ export const PinModal: React.FC<PinModalProps> = ({
         body: JSON.stringify({ pin: pin.trim() }),
       });
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data: { success?: boolean; message?: string } = {};
+      try {
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch {
+        data = {};
+      }
 
       if (response.ok && data.success) {
         setIsLoading(false);
         onSuccess();
       } else {
         setIsLoading(false);
-        setErrorMessage(data.message || 'Incorrect PIN. Please try again.');
+        setErrorMessage(
+          data.message ||
+            (response.status === 404
+              ? 'Verification endpoint (/api/verify-pin) not found on server.'
+              : 'Incorrect PIN. Please try again.')
+        );
         inputRef.current?.select();
       }
-    } catch (err) {
+    } catch {
       setIsLoading(false);
-      setErrorMessage('Server connection error. Please verify dev server is running.');
+      setErrorMessage('Unable to reach verification server. Please check your connection and try again.');
     }
   };
 
@@ -90,7 +101,7 @@ export const PinModal: React.FC<PinModalProps> = ({
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-stone-700 mb-1.5">
               Enter 6-Digit Admin PIN
@@ -99,6 +110,7 @@ export const PinModal: React.FC<PinModalProps> = ({
               <input
                 ref={inputRef}
                 type={showPin ? 'text' : 'password'}
+                name="admin-pin-code"
                 inputMode="numeric"
                 maxLength={12}
                 value={pin}
@@ -108,7 +120,9 @@ export const PinModal: React.FC<PinModalProps> = ({
                 }}
                 placeholder="••••••"
                 className="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 text-center text-lg font-mono tracking-widest focus:bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 transition-all"
-                autoComplete="off"
+                autoComplete="one-time-code"
+                data-lpignore="true"
+                data-1p-ignore="true"
               />
               <button
                 type="button"
