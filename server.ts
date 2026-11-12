@@ -13,6 +13,11 @@ async function startServer() {
   const app = express();
   app.use(express.json());
 
+  // Health check endpoint
+  app.get('/api/health', (_req, res) => {
+    res.json({ status: 'ok' });
+  });
+
   // Backend PIN verification endpoint
   // Never exposes the PIN to client-side code
   app.post('/api/verify-pin', (req, res) => {
@@ -31,14 +36,23 @@ async function startServer() {
   });
 
   const isProd = process.env.NODE_ENV === 'production';
-  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  const port = isProd && process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
   if (!isProd) {
-    const vite = await createViteServer({
+    // Initialize Vite concurrently so port 3000 binds immediately
+    const vitePromise = createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
-    app.use(vite.middlewares);
+
+    app.use(async (req, res, next) => {
+      try {
+        const vite = await vitePromise;
+        vite.middlewares(req, res, next);
+      } catch (err) {
+        next(err);
+      }
+    });
   } else {
     const distPath = path.resolve(__dirname, 'dist');
     app.use(express.static(distPath));

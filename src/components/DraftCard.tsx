@@ -55,8 +55,8 @@ export const DraftCard: React.FC<DraftCardProps> = ({ draft, onResume, onDelete 
               onDelete(draft);
             }}
             className="p-1.5 rounded-lg hover:bg-red-50 text-stone-400 hover:text-red-600 transition-colors cursor-pointer"
-            title="Delete Draft"
-            aria-label="Delete Draft"
+            title="Delete Draft (PIN required)"
+            aria-label="Delete Draft (PIN required)"
           >
             <Trash2 className="w-4 h-4" />
           </button>

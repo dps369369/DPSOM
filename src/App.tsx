@@ -158,6 +158,7 @@ export default function App() {
   // 3. PIN-protected: Delete Category (PIN + Additional Confirmation)
   const handleRequestDeleteCategory = (category: Category) => {
     executeWithPinProtection(`Delete ${category.name}`, () => {
+      setDraftToDelete(null);
       setCategoryToDelete(category);
       setIsDeleteModalOpen(true);
     });
@@ -195,10 +196,13 @@ export default function App() {
     });
   };
 
+  // PIN-protected: Delete Draft (PIN + Additional Confirmation)
   const handleDeleteDraft = (draft: DraftCategory) => {
-    setCategoryToDelete(null);
-    setDraftToDelete(draft);
-    setIsDeleteModalOpen(true);
+    executeWithPinProtection(`Delete Draft "${draft.name || 'Untitled Draft'}"`, () => {
+      setCategoryToDelete(null);
+      setDraftToDelete(draft);
+      setIsDeleteModalOpen(true);
+    });
   };
 
   // Public: Select Category for prompt generation
